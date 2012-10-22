@@ -165,7 +165,7 @@ class cache {
 	 * 0 - класс остановит выполнение скрипта, выбросив сообщение об ошибке, возвращённое сервером MySQL и текст запроса, вызвавшего ошибку;<br>
 	 * 1 - класс вернёт false;<br>
 	 * 2 - поведение будет взято из параметра $CONFIG['QUERY_ERROR_BEHAVIOR'];
-	 * @return multitype: результат выборки в виде ассоциативного многомерного массива.
+	 * @return multitype: результат выборки в виде ассоциативного многомерного массива (в случае удачного выполнения запроса).
 	 */
 	public static function select ($query,$ignore_cache=FALSE,$tags=array(),$expire=0,$error_behavior=2){
 		global $CONFIG;
@@ -213,7 +213,7 @@ class cache {
 	 * 0 - класс остановит выполнение скрипта, выбросив сообщение об ошибке, возвращённое сервером MySQL и текст запроса, вызвавшего ошибку;<br>
 	 * 1 - класс вернёт false;<br>
 	 * 2 - поведение будет взято из параметра $CONFIG['QUERY_ERROR_BEHAVIOR'];
-	 * @return number
+	 * @return number - результат, соответствующий mysql_insert_id() (в случае удачного выполнения запроса).
 	 */
 	public static function update ($query,$tags=array(),$error_behavior=2) {
 		$result=cache::sql_query($query);
