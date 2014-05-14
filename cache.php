@@ -16,6 +16,7 @@ class cache {
 	 * Внимание: функция не проверяет возможность установления соединения, так как в большинстве случаев это приводит к большим задержкам. Предполагается, что вы знаете, какие memcached-сервера вам доступны.
 	 * @return boolean - TRUE, если memcache разрешён, доступен и указаны параметры хотя бы одного сервера.
 	 */
+	
 	private static function init(){
 		if (cache::$connected) return (true); //Уже присоединились, спасибо
 		global $CONFIG;
@@ -47,6 +48,7 @@ class cache {
 	 * @param variable $value - значение
 	 * @return boolean - удалось ли занести значение в кеш
 	 */
+	
 	private static function set ($key,$value,$tags=array()){
 		global $CONFIG;
 		if ($CONFIG['MEMCACHE']==1){
@@ -77,6 +79,7 @@ class cache {
 	 * @param string $key - ключ для возврата
 	 * @return boolean - если значение получено, возвращает его, иначе возвращает FALSE
 	 */
+	
 	private static function get ($key){
 		global $CONFIG;
 		if ($CONFIG['MEMCACHE']==1){
@@ -90,6 +93,7 @@ class cache {
 	 * Полностью сбрасывает кеш memcache
 	 * @return boolean - статус операции
 	 */
+	
 	private static function flush(){
 		global $CONFIG;
 		if ($CONFIG['MEMCACHE']==1){
@@ -104,6 +108,7 @@ class cache {
 	 * @param string $key - ключ на удаление
 	 * @return boolean - статус операции
 	 */
+	
 	private static function delete($key){
 		global $CONFIG;
 		if ($CONFIG['MEMCACHE']==1){
@@ -118,6 +123,7 @@ class cache {
 	 * @param string $query
 	 * @return string
 	 */
+	
 	private static function qhash($query){
 		return (md5($query));
 	}
@@ -126,6 +132,7 @@ class cache {
 	 * Если подключение к БД недоступно, пытается установить подключение.
 	 * @return boolean - статус операции
 	 */
+	
 	private static function init_db(){
 		if (cache::$sql_connection) return (true); else {
 			global $CONFIG;
@@ -147,6 +154,7 @@ class cache {
 	 * @param string $query - запрос SQL
 	 * @return boolean - результат запроса (данные, либо ошибка).
 	 */
+	
 	private static function sql_query ($query){
 		if (cache::init_db()) {
 			return(mysql_query($query));
@@ -167,6 +175,7 @@ class cache {
 	 * 2 - поведение будет взято из параметра $CONFIG['QUERY_ERROR_BEHAVIOR'];
 	 * @return multitype: результат выборки в виде ассоциативного многомерного массива (в случае удачного выполнения запроса).
 	 */
+	
 	public static function select ($query,$ignore_cache=FALSE,$tags=array(),$expire=0,$error_behavior=2){
 		global $CONFIG;
 		if ($error_behavior==2) $error_behavior=$CONFIG['QUERY_ERROR_BEHAVIOR'];
@@ -215,6 +224,7 @@ class cache {
 	 * 2 - поведение будет взято из параметра $CONFIG['QUERY_ERROR_BEHAVIOR'];
 	 * @return number - результат, соответствующий mysql_insert_id() (в случае удачного выполнения запроса).
 	 */
+	
 	public static function update ($query,$tags=array(),$error_behavior=2) {
 		$result=cache::sql_query($query);
 		if ($result){
