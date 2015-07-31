@@ -137,10 +137,11 @@ class cache {
 		if (cache::$sql_connection) return (true); else {
 			global $CONFIG;
 			setlocale(LC_ALL, 'ru_RU.UTF-8');
-			$main_connect=($CONFIG['DB_PCONNECTION']==1)?mysql_pconnect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD']):mysql_connect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD']);
+			//$main_connect=($CONFIG['DB_PCONNECTION']==1)?mysql_pconnect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD']):mysql_connect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD']);
+			$main_connect=($CONFIG['DB_PCONNECTION']==1)?mysqli_connect("p:{$CONFIG['DB_HOST']}",$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD'],$CONFIG['DB_NAME']):mysqli_connect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD'],$CONFIG['DB_NAME']);
 			if ($main_connect) {
-				mysql_query("SET NAMES 'utf8' COLLATE 'utf8_bin';");
-				mysql_select_db ($CONFIG['DB_NAME']);
+				mysqli_query("SET NAMES 'utf8' COLLATE 'utf8_bin';");
+				//mysql_select_db ($CONFIG['DB_NAME']);
 				cache::$sql_connection=true;
 				return (true);
 			} else {
@@ -157,7 +158,7 @@ class cache {
 	
 	private static function sql_query ($query){
 		if (cache::init_db()) {
-			return(mysql_query($query));
+			return(mysqli_query($query));
 		} else {
 			die ('Can\'t connect to database!');
 		}
@@ -196,19 +197,19 @@ class cache {
 				$cache=array();
 				$result=cache::sql_query($query);// or die (mysql_error()." on query ".$query);
 				if (!$result) if ($error_behavior==1) return (false); else die (mysql_error()." on query ".$query);
-				$rows = mysql_num_rows($result);
+				$rows = mysqli_num_rows($result);
 				if (is_resource($result)){
-					for ($i=0;$i<$rows;$i++) $cache[$i] = mysql_fetch_assoc($result);
+					for ($i=0;$i<$rows;$i++) $cache[$i] = mysqli_fetch_assoc($result);
 					cache::set($key, $cache, $tags);
 				}
 			}
 		} else {
 			$cache=array();
 			$result=cache::sql_query($query);// or die (mysql_error()." on query ".$query);
-			if (!$result) if ($error_behavior==1) return (false); else die (mysql_error()." on query ".$query);
-			$rows = mysql_num_rows($result);
+			if (!$result) if ($error_behavior==1) return (false); else die (mysqli_error()." on query ".$query);
+			$rows = mysqli_num_rows($result);
 			if (is_resource($result)) for ($i=0;$i<$rows;$i++) {
-				$cache[$i] = mysql_fetch_assoc($result);
+				$cache[$i] = mysqli_fetch_assoc($result);
 			}
 		}
 		return ($cache);
@@ -222,7 +223,7 @@ class cache {
 	 * 0 - класс остановит выполнение скрипта, выбросив сообщение об ошибке, возвращённое сервером MySQL и текст запроса, вызвавшего ошибку;<br>
 	 * 1 - класс вернёт false;<br>
 	 * 2 - поведение будет взято из параметра $CONFIG['QUERY_ERROR_BEHAVIOR'];
-	 * @return number - результат, соответствующий mysql_insert_id() (в случае удачного выполнения запроса).
+	 * @return number - результат, соответствующий mysqli_insert_id() (в случае удачного выполнения запроса).
 	 */
 	
 	public static function update ($query,$tags=array(),$error_behavior=2) {
@@ -246,9 +247,9 @@ class cache {
 					;
 				break;
 			}
-			return (mysql_insert_id());
+			return (mysqli_insert_id());
 		} else {
-			if ($error_behavior==1) die (mysql_error()." on query ".$query); else return (false);
+			if ($error_behavior==1) die (mysqli_error()." on query ".$query); else return (false);
 		}
 	}
 
