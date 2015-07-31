@@ -10,7 +10,7 @@ class cache {
 	private static $memcache;
 	private static $flag;
 	private static $sql_connection;
-	private static cache::$main_connect;
+	private static $main_connect;
 
 	/**
 	 * Если memcached неинициализирован - пытается инициализировать подключения.<br>
