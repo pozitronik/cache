@@ -197,7 +197,7 @@ class cache {
 				$result=cache::sql_query($query);// or die (mysql_error()." on query ".$query);
 				if (!$result) if ($error_behavior==1) return (false); else die (mysql_error()." on query ".$query);
 				$rows = mysqli_num_rows($result);
-				if (is_resource($result)){
+				if (is_object($result)){
 					for ($i=0;$i<$rows;$i++) $cache[$i] = mysqli_fetch_assoc($result);
 					cache::set($key, $cache, $tags);
 				}
@@ -207,7 +207,7 @@ class cache {
 			$result=cache::sql_query($query);// or die (mysql_error()." on query ".$query);
 			if (!$result) if ($error_behavior==1) return (false); else die (mysqli_error()." on query ".$query);
 			$rows = mysqli_num_rows($result);
-			if (is_resource($result)) for ($i=0;$i<$rows;$i++) {
+			if (is_object($result)) for ($i=0;$i<$rows;$i++) {
 				$cache[$i] = mysqli_fetch_assoc($result);
 			}
 		}
