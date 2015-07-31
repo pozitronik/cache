@@ -10,6 +10,7 @@ class cache {
 	private static $memcache;
 	private static $flag;
 	private static $sql_connection;
+	private static cache::$main_connect;
 
 	/**
 	 * Если memcached неинициализирован - пытается инициализировать подключения.<br>
@@ -137,11 +138,9 @@ class cache {
 		if (cache::$sql_connection) return (true); else {
 			global $CONFIG;
 			setlocale(LC_ALL, 'ru_RU.UTF-8');
-			//$main_connect=($CONFIG['DB_PCONNECTION']==1)?mysql_pconnect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD']):mysql_connect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD']);
-			$main_connect=($CONFIG['DB_PCONNECTION']==1)?mysqli_connect("p:{$CONFIG['DB_HOST']}",$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD'],$CONFIG['DB_NAME']):mysqli_connect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD'],$CONFIG['DB_NAME']);
-			if ($main_connect) {
-				mysqli_query("SET NAMES 'utf8' COLLATE 'utf8_bin';");
-				//mysql_select_db ($CONFIG['DB_NAME']);
+			cache::$main_connect=($CONFIG['DB_PCONNECTION']==1)?mysqli_connect("p:{$CONFIG['DB_HOST']}",$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD'],$CONFIG['DB_NAME']):mysqli_connect($CONFIG['DB_HOST'],$CONFIG['DB_LOGIN'],$CONFIG['DB_PASSWORD'],$CONFIG['DB_NAME']);
+			if (cache::$main_connect) {
+				mysqli_query(cache::$main_connect,"SET NAMES 'utf8' COLLATE 'utf8_bin';");
 				cache::$sql_connection=true;
 				return (true);
 			} else {
@@ -158,7 +157,7 @@ class cache {
 	
 	private static function sql_query ($query){
 		if (cache::init_db()) {
-			return(mysqli_query($query));
+			return(mysqli_query(cache::$main_connect,$query));
 		} else {
 			die ('Can\'t connect to database!');
 		}
@@ -252,7 +251,16 @@ class cache {
 			if ($error_behavior==1) die (mysqli_error()." on query ".$query); else return (false);
 		}
 	}
-
+	
+	/**
+	 * Экранирует говно
+	 */
+	public function escape($inp){
+		if(is_string($inp) && strlen($inp)>0) {
+			return str_replace(array('\\', "\0", "\n", "\r", "'", '"', "\x1a"), array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'), $inp);
+		}
+	}
+	
 }
 
 ?>
